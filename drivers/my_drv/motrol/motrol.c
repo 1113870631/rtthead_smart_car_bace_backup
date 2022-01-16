@@ -38,7 +38,8 @@ void set_motrol_pin(void){
  *in1 0 in2 1 电机1反转
  *in1 0 in2 0 电机1停止
  * */
-int motrol_1_con(int dir,int speed){
+int motrol_1_con(int dir,int speed,void* device){
+    //处理方向
     switch(dir){
 
           case(MOTROL_FORHEAD): //设置前进引脚
@@ -54,11 +55,18 @@ int motrol_1_con(int dir,int speed){
                    rt_pin_write( IN2_PIN,  PIN_LOW);
                    break;
        };
+    //处理速度pwm1 pa8
+    int period=20000000;
+    int goal;
+    goal=period*speed/100;
+    rt_pwm_set(device,1,period, goal);
+    rt_kprintf("speed1 %d\n",speed);
+
        return 0;
 };
 
-int motrol_2_con(int dir,int speed){
-
+int motrol_2_con(int dir,int speed,void* device){
+    //处理方向
     switch(dir){
 
        case(MOTROL_FORHEAD): //设置前进引脚
@@ -74,6 +82,12 @@ int motrol_2_con(int dir,int speed){
                 rt_pin_write( IN4_PIN,  PIN_LOW);
                 break;
     };
+    //处理速度  pwm2 pc6
+    int period=20000000;
+    int goal;
+    goal=period*speed/100;
+    rt_pwm_set(device,1,period, goal);
+    rt_kprintf("speed2 %d\n",speed);
     return 0;
 };
 

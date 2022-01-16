@@ -127,8 +127,15 @@ static void uart_re_entry(void *parameter){
 /*线程2 入口  解析move命令缓冲区命令执行命令*/
 static void total_con_move_entry(void *parameter){
     rt_err_t ret;
+    rt_device_t  pwm1_dev,pwm2_dev;
     /*初识化引脚*/
     set_motrol_pin();
+      /*打开pwm1 pwm2*/
+      pwm1_dev = (struct rt_device_pwm *)rt_device_find("pwm1");
+      pwm2_dev = (struct rt_device_pwm *)rt_device_find("pwm2");
+      /*使能pwm1 pwm2*/
+      rt_pwm_enable(pwm1_dev, 1);
+      rt_pwm_enable(pwm2_dev, 1);
     while(1)
     {
          /*等待信号量*/
@@ -140,19 +147,29 @@ static void total_con_move_entry(void *parameter){
                 else//解析命令执行动作
                 {
                     if(command_move_pool[1]=='1'){
+                        //前进命令
                         rt_kprintf("set forhead\n");
-                        motrol_1_con(MOTROL_FORHEAD, 100);
-                        motrol_2_con(MOTROL_FORHEAD, 100);
+                        //解析速度
+                         int tmp1=0,tmp2=0,speed_tmp3=0;
+                         tmp1=command_move_pool[2]-'0';
+                         tmp2=command_move_pool[3]-'0';
+                         speed_tmp3=tmp1*10+tmp2;
+                        motrol_1_con(MOTROL_FORHEAD, speed_tmp3,pwm1_dev);
+                        motrol_2_con(MOTROL_FORHEAD, speed_tmp3,pwm2_dev);
                     };
                     if(command_move_pool[1]=='0'){
                         rt_kprintf("set stop\n");
-                        motrol_1_con(MOTROL_STOP, 100);
-                        motrol_2_con(MOTROL_STOP, 100);
+                        motrol_1_con(MOTROL_STOP, 0,pwm1_dev);
+                        motrol_2_con(MOTROL_STOP, 0,pwm2_dev);
                     };
                     if(command_move_pool[1]=='2'){
                         rt_kprintf("set back\n");
-                         motrol_1_con(MOTROL_BACKWORD, 100);
-                         motrol_2_con(MOTROL_BACKWORD, 100);
+                        int tmp1=0,tmp2=0,speed_tmp3=0;
+                        tmp1=command_move_pool[2]-'0';
+                        tmp2=command_move_pool[3]-'0';
+                        speed_tmp3=tmp1*10+tmp2;
+                         motrol_1_con(MOTROL_BACKWORD, speed_tmp3,pwm1_dev);
+                         motrol_2_con(MOTROL_BACKWORD, speed_tmp3,pwm2_dev);
                     };
                 }
     }

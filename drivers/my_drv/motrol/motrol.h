@@ -34,8 +34,8 @@
  * speed 0~100
  * */
 void set_motrol_pin(void);
-int motrol_1_con(int dir,int speed);
-int motrol_2_con(int dir,int speed);
+int motrol_1_con(int dir,int speed,void* device);
+int motrol_2_con(int dir,int speed,void* device);
 
 
 
