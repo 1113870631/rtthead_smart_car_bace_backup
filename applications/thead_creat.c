@@ -249,7 +249,7 @@ static int thead2(void){
     tid2 = rt_thread_create("con_move",
     total_con_move_entry, RT_NULL,
     THREAD_STACK_SIZE,
-    26, THREAD_TIMESLICE);
+    25, THREAD_TIMESLICE);
     /* 如 果 获 得 线 程 控 制 块， 启 动 这 个 线 程 */
     if (tid2 != RT_NULL)
     rt_thread_startup(tid2);\
