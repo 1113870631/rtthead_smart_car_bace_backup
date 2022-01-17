@@ -184,7 +184,8 @@ static void total_con_move_entry(void *parameter){
     线程3 入口  解析dir命令缓冲区命令执行命令*/
 static void total_con_dir_entry(void *parameter){
     rt_err_t ret;
-    int per;
+    int per,per_per=50;
+
 
     rt_device_t  pwm_dev;
     /*打开pwm3*/
@@ -211,12 +212,19 @@ static void total_con_dir_entry(void *parameter){
                      per=(shi*10+ge);
                      /*设置角度
                       * per 30~50~70*/
-                     ch_dir(per, 100, pwm_dev);
+                     if(per==per_per){
+
+                     }
+                     else{
+                         ch_dir(per, 100, pwm_dev);
+                         per_per=per;
+                     }
+
 
                      rt_kprintf(" thead get shi: %d\n",shi);
                      rt_kprintf("thead get ge: %d\n",ge);
                      rt_kprintf("per: %d\n",per);
-
+                     rt_thread_mdelay(3);
                    }
        }
 }
@@ -241,7 +249,7 @@ static int thead2(void){
     tid2 = rt_thread_create("con_move",
     total_con_move_entry, RT_NULL,
     THREAD_STACK_SIZE,
-    THREAD_PRIORITY, THREAD_TIMESLICE);
+    26, THREAD_TIMESLICE);
     /* 如 果 获 得 线 程 控 制 块， 启 动 这 个 线 程 */
     if (tid2 != RT_NULL)
     rt_thread_startup(tid2);\
@@ -254,7 +262,7 @@ static int thead3(void){
     tid3 = rt_thread_create("con_dir",
     total_con_dir_entry, RT_NULL,
     THREAD_STACK_SIZE,
-    THREAD_PRIORITY, THREAD_TIMESLICE);
+    26, THREAD_TIMESLICE);
     /* 如 果 获 得 线 程 控 制 块， 启 动 这 个 线 程 */
     if (tid3 != RT_NULL)
     rt_thread_startup(tid3);\
