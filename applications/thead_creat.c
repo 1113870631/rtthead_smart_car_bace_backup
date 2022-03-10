@@ -20,6 +20,7 @@
 char command_move_pool[4];
 char command_dir_pool[4];
 int num=0;
+int encoder_num=0;
 rt_sem_t rx_sem,move_sem,dir_sem;
 /*线程1 入口 接收上层命令 传输到对应的命令缓冲区*/
 static void uart_re_entry(void *parameter){
@@ -230,9 +231,34 @@ static void total_con_dir_entry(void *parameter){
 }
 
 
+/*
+ * 线程4 入口 encoder1
+ *
+ *
+ * */
+#define ENCODER_PIN  85
+void encoder_irq(void *args){
+    encoder_num++;
+    if(encoder_num==54)
+        encoder_num=0;
+rt_kprintf("%d\n",encoder_num);
+}
+static void encoder1( void *parameter){
+//引脚初识化
+
+    rt_pin_mode(ENCODER_PIN, PIN_MODE_INPUT);
+    rt_pin_attach_irq(ENCODER_PIN, PIN_IRQ_MODE_FALLING, encoder_irq, RT_NULL);
+    /* 使 能 中 断 */
+    rt_pin_irq_enable(ENCODER_PIN, PIN_IRQ_ENABLE);
+    while(1)
+    {
+        rt_thread_mdelay(10);
+    }
+}
+
 static int thead1(void){
     rt_thread_t tid1;
-    /* 创 建 线 程 1， 名 称 是 thread1， 入 口 是 thread1_entry*/
+    /* 创 建 线 程 1， 名 称 是 uart2_re， 入 口 是 uart2_re*/
     tid1 = rt_thread_create("uart2_re",
     uart_re_entry, RT_NULL,
     THREAD_STACK_SIZE,
@@ -258,7 +284,7 @@ static int thead2(void){
 }
 static int thead3(void){
     rt_thread_t tid3;
-    /* 创 建 线 程 2， 名 称 是 total_con， 入 口 是 total_con_dir_entry*/
+    /* 创 建 线 程 3， 名 称 是 con_dir， 入 口 是 con_dir*/
     tid3 = rt_thread_create("con_dir",
     total_con_dir_entry, RT_NULL,
     THREAD_STACK_SIZE,
@@ -271,9 +297,27 @@ static int thead3(void){
 }
 
 
+static int thead4(void){
+    rt_thread_t tid4;
+    /* 创 建 线 程 4， 名 称 是 tid4， 入 口 是 encoder1*/
+    tid4 = rt_thread_create("encoder1",
+     encoder1, RT_NULL,
+    THREAD_STACK_SIZE,
+    26, THREAD_TIMESLICE);
+    /* 如 果 获 得 线 程 控 制 块， 启 动 这 个 线 程 */
+    if (tid4 != RT_NULL)
+    rt_thread_startup(tid4);\
+    rt_kprintf("thead4 ok\n");
+    return 0;
+}
+
+
 int thead_creat(void){
-    thead1();//启动线程1 命令接收与转移
-    thead2();//启动线程2 move 命令解析与执行
-    thead3();//启动线程3 dir 命令解析与执行
+    thead1();//启动线程1 uart 命令接收与转移到缓冲区
+     // nrf命令接收 转移到缓冲区
+    thead2();//启动线程2 move 缓冲区 命令解析与执行
+    thead3();//启动线程3 dir  缓冲区命令解析与执行
+    thead4();//启动线程4encoder1
+
     return 0;
 };

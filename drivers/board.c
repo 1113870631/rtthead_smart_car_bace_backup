@@ -98,4 +98,5 @@ RT_WEAK void rt_hw_board_init()
                       HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 
+
 }
