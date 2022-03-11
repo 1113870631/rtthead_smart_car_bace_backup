@@ -4,6 +4,9 @@
 #include <thead_creat.h>
 #include <motrol.h>
 #include <motrol_dir.h>
+#define LOG_TAG "thead_creat.c"
+#define LOG_LVL LOG_LVL_DBG
+#include <ulog.h>
 /*命令缓冲区
  * [0] [0/1/-1] [speed][保留]
  * [0]:代表是速度控制命令
@@ -132,11 +135,11 @@ static void total_con_move_entry(void *parameter){
     /*初识化引脚*/
     set_motrol_pin();
       /*打开pwm1 pwm2*/
-      pwm1_dev = (struct rt_device_pwm *)rt_device_find("pwm1");
-      pwm2_dev = (struct rt_device_pwm *)rt_device_find("pwm2");
+      pwm1_dev = rt_device_find("pwm1");
+      pwm2_dev = rt_device_find("pwm2");
       /*使能pwm1 pwm2*/
-      rt_pwm_enable(pwm1_dev, 1);
-      rt_pwm_enable(pwm2_dev, 1);
+      rt_pwm_enable((struct rt_device_pwm *)pwm1_dev, 1);
+      rt_pwm_enable((struct rt_device_pwm *)pwm2_dev, 1);
     while(1)
     {
          /*等待信号量*/
@@ -190,9 +193,9 @@ static void total_con_dir_entry(void *parameter){
 
     rt_device_t  pwm_dev;
     /*打开pwm3*/
-    pwm_dev = (struct rt_device_pwm *)rt_device_find("pwm3");
+    pwm_dev = rt_device_find("pwm3");
     /*使能pwm3*/
-    rt_pwm_enable(pwm_dev, 1);
+    rt_pwm_enable((struct rt_device_pwm *)pwm_dev, 1);
     /*初始化方向*/
     dir_init(pwm_dev);
        while(1)
@@ -241,7 +244,7 @@ void encoder_irq(void *args){
     encoder_num++;
     if(encoder_num==54)
         encoder_num=0;
-rt_kprintf("%d\n",encoder_num);
+    LOG_I("LOG_I encoder_num %d:",encoder_num);
 }
 static void encoder1( void *parameter){
 //引脚初识化
