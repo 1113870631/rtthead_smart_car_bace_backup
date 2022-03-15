@@ -82,7 +82,6 @@ RT_WEAK void rt_hw_board_init()
                       __HAL_RCC_GPIOB_CLK_ENABLE();
                       __HAL_RCC_GPIOG_CLK_ENABLE();
                       /**SPI2 GPIO Configuration
-                      PB12     ------> SPI2_NSS
                       PB13     ------> SPI2_SCK
                       PB14     ------> SPI2_MISO
                       PB15     ------> SPI2_MOSI
